@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Go API Tester</title>
+	<link rel="icon" type="image/svg" href="/favicon.svg" />
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <!-- 模式切换 -->
+                <div class="mode-switcher">
+                    <button id="mode-api" class="mode-btn active" onclick="switchMode('api')">API Request</button>
+                    <button id="mode-mock" class="mode-btn" onclick="switchMode('mock')">Mock Server</button>
+                </div>
+                
+                <!-- 头部操作栏 -->
+                <div class="sidebar-actions">
+                    <span id="sidebar-title">Collections</span>
+                    <div class="sidebar-tools">
+                        <!-- Import/Export Buttons -->
+                        <button class="btn btn-secondary btn-sm" onclick="handleExportData()" title="Export Data">⬇️</button>
+                        <button class="btn btn-secondary btn-sm" onclick="triggerImport()" title="Import Data">⬆️</button>
+                        <!-- Add Button -->
+                        <button id="btn-sidebar-add" class="btn btn-secondary btn-sm" onclick="handleSidebarAdd()" title="New Collection/Mock">+</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 列表内容容器 -->
+            <div class="sidebar-content" id="sidebar-list"></div>
+        </div>
+
+        <!-- 主区域 -->
+        <div class="main-content">
+            
+            <!-- VIEW: API Request -->
+            <div id="view-api" class="workspace" style="display:flex; height:100%;">
+                <div class="toolbar">
+                    <select id="req-method" class="method-select">
+                        <option value="GET">GET</option><option value="POST">POST</option><option value="PUT">PUT</option><option value="DELETE">DELETE</option><option value="PATCH">PATCH</option>
+                    </select>
+                    <input type="text" id="req-url" class="url-input" placeholder="Enter request URL">
+                    <button id="btn-send" class="btn btn-primary">Send</button>
+                    <button id="btn-save" class="btn btn-secondary" onclick="openSaveModal()">Save</button>
+                </div>
+
+                <div class="nav-tabs">
+                    <div class="nav-tab active" onclick="switchTab('params')">Params</div>
+                    <div class="nav-tab" onclick="switchTab('auth')">Auth</div>
+                    <div class="nav-tab" onclick="switchTab('headers')">Headers</div>
+                    <div class="nav-tab" onclick="switchTab('body')">Body</div>
+                </div>
+
+                <div class="workspace">
+                    <div id="tab-params" class="tab-content-container active"><table class="kv-table"><thead><tr><th width="30"></th><th>Key</th><th>Value</th><th>Desc</th><th width="30"></th></tr></thead><tbody id="params-container"></tbody></table></div>
+                    <div id="tab-auth" class="tab-content-container">
+                        <div style="padding:20px;">
+                            <div class="form-row"><label class="form-label">Type</label><select id="auth-type" class="form-control" style="width:200px;"><option value="none">No Auth</option><option value="bearer">Bearer</option><option value="basic">Basic</option></select></div>
+                            <div id="auth-bearer" class="auth-config hidden"><div class="form-row"><label class="form-label">Token</label><input type="text" id="auth-bearer-token" class="form-control"></div></div>
+                            <div id="auth-basic" class="auth-config hidden"><div class="form-row"><label class="form-label">User</label><input type="text" id="auth-basic-user" class="form-control"></div><div class="form-row"><label class="form-label">Pass</label><input type="password" id="auth-basic-pass" class="form-control"></div></div>
+                        </div>
+                    </div>
+                    <div id="tab-headers" class="tab-content-container"><table class="kv-table"><thead><tr><th width="30"></th><th>Key</th><th>Value</th><th>Desc</th><th width="30"></th></tr></thead><tbody id="headers-container"></tbody></table></div>
+                    <div id="tab-body" class="tab-content-container">
+                        <div class="body-type-selector">
+                            <label class="radio-label"><input type="radio" name="body-type" value="none" checked> None</label>
+                            <label class="radio-label"><input type="radio" name="body-type" value="form-data"> form-data</label>
+                            <label class="radio-label"><input type="radio" name="body-type" value="x-www-form-urlencoded"> x-www-form</label>
+                            <label class="radio-label"><input type="radio" name="body-type" value="raw"> raw</label>
+                        </div>
+                        <div id="body-raw-editor" class="hidden" style="flex:1; display:flex; flex-direction:column;">
+                            <div style="padding:5px 15px; border-bottom:1px solid #eee;"><button onclick="formatJSON()" style="border:none;background:none;color:var(--primary-color);cursor:pointer;">Beautify JSON</button></div>
+                            <textarea id="raw-body-input" class="code-editor"></textarea>
+                        </div>
+                        <div id="body-form-data" class="hidden"><table class="kv-table"><thead><tr><th width="30"></th><th>Key</th><th>Value</th><th>Type</th><th width="30"></th></tr></thead><tbody id="form-data-container"></tbody></table></div>
+                        <div id="body-urlencoded" class="hidden"><table class="kv-table"><thead><tr><th width="30"></th><th>Key</th><th>Value</th><th>Desc</th><th width="30"></th></tr></thead><tbody id="urlencoded-container"></tbody></table></div>
+                    </div>
+                </div>
+
+                <div class="response-pane">
+                    <div class="response-header-bar">
+                        <div class="response-tabs">
+                            <div class="resp-tab active" onclick="switchRespTab('body')">Body</div>
+                            <div class="resp-tab" onclick="switchRespTab('headers')">Headers</div>
+                        </div>
+                        <div class="response-meta"><div class="meta-item">Status: <span id="resp-status">-</span></div><div class="meta-item">Time: <span id="resp-time">0ms</span></div></div>
+                    </div>
+
+                    <div id="resp-tab-body" class="response-content active">
+                        <div class="resp-toolbar">
+                            <div class="resp-view-btn active" id="btn-view-pretty" onclick="setRespView('pretty')">Pretty</div>
+                            <div class="resp-view-btn" id="btn-view-raw" onclick="setRespView('raw')">Raw</div>
+                            <div class="resp-view-btn" id="btn-view-preview" onclick="setRespView('preview')" style="display:none;">Preview</div>
+                            <div class="resp-view-btn" id="btn-view-hex" onclick="setRespView('hex')" style="display:none;">Hex</div>
+                        </div>
+                        <div style="flex:1; position:relative; overflow:hidden;">
+                            <textarea id="resp-body" class="code-editor" readonly></textarea>
+                            <div id="resp-preview-box" class="preview-container"></div>
+                            <div id="resp-hex-box" class="preview-container"></div>
+                        </div>
+                    </div>
+                    <div id="resp-tab-headers" class="response-content"><div style="flex:1; overflow-y:auto;"><table class="kv-table"><thead><tr><th>Key</th><th>Value</th></tr></thead><tbody id="resp-headers-tbody"></tbody></table></div></div>
+                </div>
+            </div>
+
+            <!-- VIEW: Mock Editor -->
+            <div id="view-mock" class="workspace" style="display:none; height:100%;">
+                <div class="toolbar">
+                    <div style="flex:1; font-weight:bold; color:#555;">Mock Rule Editor</div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <label><input type="checkbox" id="mock-active"> Enable</label>
+                        <button class="btn btn-secondary" onclick="resetMockForm()">New Rule</button>
+                        <button class="btn btn-primary" onclick="saveMockRule()">Save Rule</button>
+                        <button class="btn btn-danger" id="btn-delete-mock" style="display:none;" onclick="deleteMockRule()">Delete</button>
+                    </div>
+                </div>
+                
+                <div class="mock-editor-container">
+                    <div class="form-row">
+                        <label class="form-label">Path Pattern (e.g., /users/123)</label>
+                        <input type="text" id="mock-path" class="full-width-input" placeholder="/path/to/mock">
+                        <div class="mock-url-preview" id="mock-url-preview">
+                            <span>http://127.0.0.1:17780/mock/...</span>
+                            <span class="copy-btn" onclick="copyMockUrl()">Copy</span>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:20px;">
+                        <div class="form-row" style="flex:1;">
+                            <label class="form-label">Method</label>
+                            <select id="mock-method" class="full-width-input">
+                                <option value="GET">GET</option><option value="POST">POST</option><option value="PUT">PUT</option><option value="DELETE">DELETE</option><option value="PATCH">PATCH</option>
+                            </select>
+                        </div>
+                        <div class="form-row" style="width:120px;">
+                            <label class="form-label">Status Code</label>
+                            <input type="number" id="mock-status" class="full-width-input" value="200">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">Response Headers</label>
+                        <table class="kv-table" style="border:1px solid #eee;">
+                            <thead><tr><th width="30"></th><th>Key</th><th>Value</th><th width="30"></th></tr></thead>
+                            <tbody id="mock-headers-container"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="form-row" style="flex:1; display:flex; flex-direction:column; height:300px;">
+                        <div style="display:flex; justify-content:space-between;">
+                            <label class="form-label">Response Body (JSON/Text)</label>
+                            <span class="copy-btn" onclick="formatMockJSON()">Beautify JSON</span>
+                        </div>
+                        <textarea id="mock-body" class="code-editor" style="border:1px solid #eee;"></textarea>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Save Modal -->
+    <div id="save-modal" class="modal-overlay">
+        <div class="modal">
+            <h3 id="save-modal-title">Save Request</h3>
+            <div class="form-group"><label>Name</label><input type="text" id="save-name" class="form-control"></div>
+            <div class="form-group"><label>Collection</label><div class="input-group"><select id="save-collection" class="form-control"></select><button class="btn btn-secondary" onclick="quickCreateCollection()">+</button></div></div>
+            <div class="modal-footer" id="save-modal-footer"></div>
+        </div>
+    </div>
+
+    <!-- Hidden Import Input -->
+    <input type="file" id="import-file" accept=".json" style="display:none">
+
+    <script src="app.js"></script>
+</body>
+</html>

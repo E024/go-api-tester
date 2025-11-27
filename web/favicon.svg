@@ -1,0 +1,36 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Go 语言风格的渐变蓝 -->
+    <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00ADD8;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#007ACC;stop-opacity:1" />
+    </linearGradient>
+    <!-- 内部投影效果 -->
+    <filter id="inner-shadow">
+      <feOffset dx="0" dy="4" />
+      <feGaussianBlur stdDeviation="4" result="offset-blur" />
+      <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse" />
+      <feFlood flood-color="black" flood-opacity="0.2" result="color" />
+      <feComposite operator="in" in="color" in2="inverse" result="shadow" />
+      <feComposite operator="over" in="shadow" in2="SourceGraphic" />
+    </filter>
+  </defs>
+
+  <!-- 背景：圆角矩形 -->
+  <rect x="32" y="32" width="448" height="448" rx="90" ry="90" fill="url(#bg-gradient)" />
+
+  <!-- 中心图形：六边形代表"服务/接口"，中间的闪电/脉冲代表"快速测试/连接" -->
+  <g transform="translate(256, 256) scale(0.9)">
+    <!-- 白色六边形边框 -->
+    <path d="M0 -130 L112.58 -65 L112.58 65 L0 130 L-112.58 65 L-112.58 -65 Z" 
+          fill="none" stroke="white" stroke-width="24" stroke-linejoin="round" />
+    
+    <!-- 中心闪电/脉冲形状 -->
+    <path d="M-40 -50 L20 -10 L-20 10 L40 50" 
+          fill="none" stroke="white" stroke-width="24" stroke-linecap="round" stroke-linejoin="round" />
+    
+    <!-- 装饰点 -->
+    <circle cx="-112" cy="-65" r="12" fill="white" />
+    <circle cx="112" cy="65" r="12" fill="white" />
+  </g>
+</svg>
