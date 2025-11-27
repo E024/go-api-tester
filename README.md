@@ -4,7 +4,7 @@
 
 它采用 **B/S 架构** 的变体设计：后端使用 Golang 提供强大的网络代理和数据存储能力，前端使用纯原生 HTML/JS/CSS 构建。最终编译为**单个可执行文件**，双击即用，数据存储在本地 SQLite 中，并在 Windows 平台支持**系统托盘驻留**和后台运行。
 
-*(请在此处替换为实际的应用截图)*
+![运行界面](./images/demo.png)
 
 ## **✨ 核心功能**
 
@@ -81,7 +81,7 @@ go run ./cmd/server
 
 1. 确保根目录下有 icon.ico 图标文件。  
 2. 安装构建辅助工具：  
-   go install \[github.com/josephspurrier/goversioninfo/cmd/goversioninfo@latest\](https://github.com/josephspurrier/goversioninfo/cmd/goversioninfo@latest)
+   go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo@latest
 
 ### **一键打包**
 
