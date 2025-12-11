@@ -27,3 +27,5 @@ client.exe
 /TPlayerAssist/.vs
 /TPlayerSupport/.vs
 /TSkin/.vs/TSkin.csproj.dtbcache.json
+api-tester.exe
+api_tester.db

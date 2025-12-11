@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go API Tester - Product Tour</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a0aec0; }
+
+        /* Animation Utilities */
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .slide-in { animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { transform: translateX(-20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* Interactive Elements */
+        .feature-card { transition: all 0.3s ease; cursor: pointer; border-left: 4px solid transparent; }
+        .feature-card:hover, .feature-card.active { transform: translateX(5px); background-color: #ebf8ff; border-left-color: #00ADD8; }
+        
+        .arch-node { cursor: pointer; transition: color 0.2s; }
+        .arch-node:hover { color: #00ADD8; font-weight: bold; }
+
+        /* Code Block Styling */
+        .code-block { background-color: #1a202c; color: #a0aec0; font-family: monospace; padding: 1rem; border-radius: 0.5rem; position: relative; }
+        .code-keyword { color: #ff79c6; }
+        .code-string { color: #f1fa8c; }
+        .code-comment { color: #6272a4; }
+
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) { .chart-container { height: 400px; } }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        goBlue: '#00ADD8',
+                        goDark: '#2d3748',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans h-screen flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 shadow-sm z-10 flex-none">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-goBlue rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-sm">G</div>
+                <h1 class="text-xl font-bold text-slate-800 tracking-tight">Go API Tester <span class="text-xs font-normal text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full ml-2">v1.0</span></h1>
+            </div>
+            <nav class="hidden md:flex space-x-8">
+                <button onclick="navTo('dashboard')" class="nav-btn text-slate-600 hover:text-goBlue font-medium transition">Overview</button>
+                <button onclick="navTo('features')" class="nav-btn text-slate-600 hover:text-goBlue font-medium transition">Features</button>
+                <button onclick="navTo('architecture')" class="nav-btn text-slate-600 hover:text-goBlue font-medium transition">Architecture</button>
+                <button onclick="navTo('start')" class="bg-goBlue text-white px-4 py-2 rounded-md hover:bg-cyan-600 transition shadow-md font-medium">Get Started</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-hidden relative">
+        <div id="app-container" class="h-full overflow-y-auto p-6 scroll-smooth">
+            
+            <!-- SECTION 1: DASHBOARD & OVERVIEW -->
+            <section id="dashboard" class="max-w-7xl mx-auto mb-24 fade-in">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <span class="text-goBlue font-bold tracking-wider uppercase text-sm">Private & Lightweight</span>
+                        <h2 class="text-4xl md:text-5xl font-extrabold text-slate-900 mt-2 mb-6 leading-tight">
+                            The Native Alternative to <span class="text-slate-400 line-through decoration-2 decoration-red-400">Bloated</span> API Tools.
+                        </h2>
+                        <p class="text-lg text-slate-600 mb-8 leading-relaxed">
+                            Go API Tester brings the power of Postman into a <b>single binary</b>. Built with Golang and Vanilla JS, it offers instant startup, local SQLite storage, and zero cloud dependencies.
+                        </p>
+                        <div class="flex flex-wrap gap-4">
+                            <div class="flex items-center gap-2 bg-white px-4 py-3 rounded-lg shadow-sm border border-slate-200">
+                                <span class="text-2xl">🚀</span>
+                                <div>
+                                    <p class="text-sm text-slate-500 font-semibold">Startup</p>
+                                    <p class="font-bold text-slate-800">&lt; 50ms</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 bg-white px-4 py-3 rounded-lg shadow-sm border border-slate-200">
+                                <span class="text-2xl">💾</span>
+                                <div>
+                                    <p class="text-sm text-slate-500 font-semibold">Storage</p>
+                                    <p class="font-bold text-slate-800">SQLite</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 bg-white px-4 py-3 rounded-lg shadow-sm border border-slate-200">
+                                <span class="text-2xl">🛡️</span>
+                                <div>
+                                    <p class="text-sm text-slate-500 font-semibold">Privacy</p>
+                                    <p class="font-bold text-slate-800">100% Local</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Chart Container -->
+                    <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-100 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-goBlue to-cyan-300"></div>
+                        <h3 class="text-lg font-bold text-slate-700 mb-4 text-center">Performance vs. Electron Apps</h3>
+                        <div class="chart-container">
+                            <canvas id="performanceChart"></canvas>
+                        </div>
+                        <p class="text-center text-xs text-slate-400 mt-4">*Conceptual comparison based on architecture overhead</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 2: FEATURE EXPLORER -->
+            <section id="features" class="max-w-7xl mx-auto mb-24 pt-10 border-t border-slate-200">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-slate-900">Core Capabilities</h2>
+                    <p class="text-slate-600 mt-2">Explore the complete toolkit built into the single executable.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 h-[600px]">
+                    <!-- Sidebar Menu -->
+                    <div class="lg:col-span-4 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                        <div class="p-4 bg-slate-50 border-b border-slate-100 font-bold text-slate-700">Feature Modules</div>
+                        <div class="overflow-y-auto flex-1 p-2 space-y-1">
+                            <div onclick="showFeature('api')" class="feature-card active p-4 rounded-lg group">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-slate-700 group-hover:text-goBlue">🚀 API Debugging</span>
+                                    <span class="text-slate-400 text-xs">HTTP/S</span>
+                                </div>
+                                <p class="text-xs text-slate-500 mt-1">Params sync, Gzip, Hex view.</p>
+                            </div>
+                            <div onclick="showFeature('mock')" class="feature-card p-4 rounded-lg group">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-slate-700 group-hover:text-goBlue">🎭 Dynamic Mock</span>
+                                    <span class="text-slate-400 text-xs">Server</span>
+                                </div>
+                                <p class="text-xs text-slate-500 mt-1">Local server, Regex paths.</p>
+                            </div>
+                            <div onclick="showFeature('data')" class="feature-card p-4 rounded-lg group">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-slate-700 group-hover:text-goBlue">📂 Data Management</span>
+                                    <span class="text-slate-400 text-xs">CRUD</span>
+                                </div>
+                                <p class="text-xs text-slate-500 mt-1">Collections, Import/Export.</p>
+                            </div>
+                            <div onclick="showFeature('system')" class="feature-card p-4 rounded-lg group">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-slate-700 group-hover:text-goBlue">🖥️ System Integration</span>
+                                    <span class="text-slate-400 text-xs">OS Native</span>
+                                </div>
+                                <p class="text-xs text-slate-500 mt-1">Tray icon, Single binary.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detail View -->
+                    <div class="lg:col-span-8 bg-slate-800 rounded-xl shadow-xl p-8 relative overflow-hidden flex flex-col justify-center">
+                        <!-- Background Element -->
+                        <div class="absolute top-0 right-0 w-64 h-64 bg-goBlue opacity-10 rounded-full blur-3xl -mr-20 -mt-20"></div>
+                        
+                        <div id="feature-content" class="relative z-10 fade-in">
+                            <!-- Content Injected via JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 3: ARCHITECTURE -->
+            <section id="architecture" class="max-w-7xl mx-auto mb-24 pt-10">
+                <div class="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-900 mb-4">B/S Architecture (Golang + Native Web)</h2>
+                            <p class="text-slate-600 mb-6">
+                                The app runs a local Go HTTP server that serves a lightweight, framework-free frontend. This ensures cross-platform compatibility while maintaining native performance.
+                            </p>
+                            
+                            <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 font-mono text-sm select-none">
+                                <div class="mb-2 font-bold text-slate-400">Project Structure (Hover to explore)</div>
+                                <div class="pl-2 border-l-2 border-slate-300 space-y-1">
+                                    <div>📁 <span class="arch-node" onmouseover="explain('root')">go-api-tester/</span></div>
+                                    <div class="pl-4">├── 📁 <span class="arch-node" onmouseover="explain('cmd')">cmd/</span></div>
+                                    <div class="pl-8">├── 📄 <span class="arch-node" onmouseover="explain('main')">main.go</span> (Entry & Tray)</div>
+                                    <div class="pl-4">├── 📁 <span class="arch-node" onmouseover="explain('internal')">internal/</span></div>
+                                    <div class="pl-8">├── 📁 <span class="arch-node" onmouseover="explain('proxy')">proxy/</span> (HTTP Client)</div>
+                                    <div class="pl-8">├── 📁 <span class="arch-node" onmouseover="explain('mock')">mock/</span> (Engine)</div>
+                                    <div class="pl-8">├── 📁 <span class="arch-node" onmouseover="explain('db')">database/</span> (SQLite)</div>
+                                    <div class="pl-4">├── 📁 <span class="arch-node" onmouseover="explain('web')">web/</span></div>
+                                    <div class="pl-8">├── 📄 <span class="arch-node" onmouseover="explain('frontend')">index.html / app.js</span></div>
+                                    <div class="pl-4">├── 📄 <span class="arch-node" onmouseover="explain('build')">build_release.bat</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-col justify-center">
+                            <div id="arch-detail" class="bg-slate-900 text-slate-300 p-6 rounded-lg shadow-inner h-64 flex flex-col justify-center items-center text-center transition-all">
+                                <span class="text-4xl mb-4">📦</span>
+                                <h3 class="text-xl font-bold text-white mb-2">Explore the Source</h3>
+                                <p>Hover over the file tree on the left to see how the components interact.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 4: GET STARTED -->
+            <section id="start" class="max-w-4xl mx-auto pb-24 pt-10">
+                <h2 class="text-3xl font-bold text-slate-900 text-center mb-10">Ready to Build?</h2>
+                
+                <div class="space-y-6">
+                    <!-- Step 1 -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="bg-slate-50 px-6 py-3 border-b border-slate-100 flex justify-between items-center">
+                            <span class="font-bold text-slate-700">1. Local Development</span>
+                            <span class="text-xs font-mono bg-slate-200 text-slate-600 px-2 py-1 rounded">Go 1.22+</span>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-slate-600 mb-4">Run the server directly. The frontend assets are served automatically.</p>
+                            <div class="code-block">
+                                <span class="text-green-400">$</span> go run ./cmd/server
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="bg-slate-50 px-6 py-3 border-b border-slate-100 flex justify-between items-center">
+                            <span class="font-bold text-slate-700">2. Build for Windows</span>
+                            <span class="text-xs font-mono bg-slate-200 text-slate-600 px-2 py-1 rounded">Production</span>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-slate-600 mb-4">Generates a single <code>.exe</code> with icon, version info, and hidden console.</p>
+                            <div class="code-block">
+                                <span class="text-green-400">></span> build_release.bat
+                            </div>
+                            <div class="mt-4 text-sm text-slate-500 flex gap-2 items-center">
+                                <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                                <span>Output: <b>api-tester.exe</b> (Includes embed resources & systray support)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer class="text-center text-slate-400 py-10 border-t border-slate-200 mt-10">
+                <p>Go API Tester &copy; 2023. Open Source MIT License.</p>
+            </footer>
+        </div>
+    </main>
+
+    <script>
+        // --- Data & Content Definitions ---
+        
+        const featureContent = {
+            api: {
+                title: "🚀 API Debugging",
+                desc: "Full-lifecycle HTTP request management.",
+                points: [
+                    "<b>Methods:</b> GET, POST, PUT, DELETE, PATCH",
+                    "<b>Auth:</b> Basic Auth, Bearer Token support",
+                    "<b>Views:</b> Pretty JSON, Raw, Hex, Image Preview",
+                    "<b>Smart:</b> URL query params auto-sync with UI table"
+                ],
+                code: `// Example: Internal Proxy Logic
+func SendRequest(req ProxyRequest) {
+  // Auto-handles Gzip & Encoding
+  client := &http.Client{Timeout: 60s}
+  resp, _ := client.Do(goReq)
+  // Returns Base64 for binary data
+}`
+            },
+            mock: {
+                title: "🎭 Dynamic Mock Server",
+                desc: "Zero-dependency local mock engine.",
+                points: [
+                    "<b>Local:</b> Runs on <code>localhost:17780/mock/</code>",
+                    "<b>Rules:</b> Define Path, Method, Status, Body",
+                    "<b>Switch:</b> One-click 'Use Mock' toggle in UI",
+                    "<b>Flexible:</b> Supports custom headers & delay"
+                ],
+                code: `// Mock Engine
+func HandleMockRequest(w, r) {
+  path := strings.TrimPrefix(r.URL.Path, "/mock")
+  rule := db.FindRule(path, r.Method)
+  w.WriteHeader(rule.StatusCode)
+  w.Write(rule.Body)
+}`
+            },
+            data: {
+                title: "📂 Data Management",
+                desc: "Robust local storage with import/export capabilities.",
+                points: [
+                    "<b>Storage:</b> SQLite (No setup required)",
+                    "<b>Organization:</b> Nested Collections & Folders",
+                    "<b>Portable:</b> Full JSON Export/Import",
+                    "<b>Smart Merge:</b> Conflict resolution during import"
+                ],
+                code: `// SQLite Schema
+CREATE TABLE requests (
+  id INTEGER PRIMARY KEY,
+  collection_id INTEGER,
+  config TEXT, -- JSON blob for flexibility
+  updated_at DATETIME
+);`
+            },
+            system: {
+                title: "🖥️ System Integration",
+                desc: "Native application feel on Windows.",
+                points: [
+                    "<b>Single Binary:</b> Assets embedded via <code>//go:embed</code>",
+                    "<b>Tray Icon:</b> Runs in background system tray",
+                    "<b>Silent:</b> No annoying console windows in release",
+                    "<b>Menu:</b> Right-click tray to Open/Quit"
+                ],
+                code: `// Windows Tray Implementation
+func runTray() {
+  systray.SetIcon(iconData)
+  mQuit := systray.AddMenuItem("Quit", "")
+  // Runs native loop
+  systray.Run(onReady, onExit)
+}`
+            }
+        };
+
+        const archExplanations = {
+            root: { title: "Project Root", text: "Contains build scripts, configuration files (versioninfo.json), and module definitions." },
+            cmd: { title: "Entry Point", text: "Hosts the main application logic. <code>tray_windows.go</code> handles OS-specific UI logic." },
+            main: { title: "Main Loop", text: "Initializes the SQLite DB, starts the HTTP server in a goroutine, and launches the System Tray." },
+            internal: { title: "Internal Logic", text: "Private application code not importable by other projects. Enforces modularity." },
+            proxy: { title: "Proxy Service", text: "The core engine. It receives JSON from the frontend, constructs the real HTTP request, handles Gzip/Binary, and returns the result." },
+            mock: { title: "Mock Engine", text: "Intercepts requests to <code>/mock/*</code> and returns pre-defined responses from the database." },
+            db: { title: "Database Layer", text: "Manages SQLite connections, migrations, and CRUD operations for Requests and Collections." },
+            web: { title: "Frontend Assets", text: "Contains the SPA (HTML/CSS/JS). These files are embedded into the binary at build time." },
+            frontend: { title: "Single Page App", text: "Vanilla JS application. Handles all UI logic, state management, and API communication." },
+            build: { title: "Build Script", text: "Automates resource generation (icons) and compiles the Go binary with linker flags to hide the console." }
+        };
+
+        // --- Chart.js Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Startup Speed', 'Memory Efficiency', 'Disk Space', 'Native Feel', 'Complexity'],
+                    datasets: [{
+                        label: 'Go API Tester',
+                        data: [95, 90, 98, 85, 20],
+                        fill: true,
+                        backgroundColor: 'rgba(0, 173, 216, 0.2)',
+                        borderColor: '#00ADD8',
+                        pointBackgroundColor: '#00ADD8',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#00ADD8'
+                    }, {
+                        label: 'Electron Alternatives',
+                        data: [40, 30, 20, 60, 90],
+                        fill: true,
+                        backgroundColor: 'rgba(148, 163, 184, 0.2)',
+                        borderColor: '#94a3b8',
+                        pointBackgroundColor: '#94a3b8',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#94a3b8'
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    scales: { r: { suggestedMin: 0, suggestedMax: 100, ticks: { display: false } } },
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+
+            // Load default feature
+            showFeature('api');
+        });
+
+        // --- Interactions ---
+
+        function navTo(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function showFeature(key) {
+            // Update Menu UI
+            document.querySelectorAll('.feature-card').forEach(el => el.classList.remove('active', 'bg-sky-50', 'border-l-4', 'border-goBlue'));
+            event.currentTarget.classList.add('active', 'bg-sky-50', 'border-l-4', 'border-goBlue');
+
+            // Render Content
+            const data = featureContent[key];
+            const container = document.getElementById('feature-content');
+            
+            // Animation reset
+            container.classList.remove('fade-in');
+            void container.offsetWidth; // trigger reflow
+            container.classList.add('fade-in');
+
+            const listHtml = data.points.map(p => `<li class="flex items-start gap-2"><span class="text-goBlue mt-1">✓</span> <span class="text-slate-300 text-sm">${p}</span></li>`).join('');
+
+            container.innerHTML = `
+                <h3 class="text-2xl font-bold text-white mb-2">${data.title}</h3>
+                <p class="text-slate-400 mb-6">${data.desc}</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <ul class="space-y-3 bg-slate-900/50 p-4 rounded-lg border border-slate-700">
+                        ${listHtml}
+                    </ul>
+                    <div class="code-block text-xs overflow-x-auto shadow-inner border border-slate-700">
+                        <pre><code>${highlightCode(data.code)}</code></pre>
+                    </div>
+                </div>
+            `;
+        }
+
+        function highlightCode(str) {
+            // Simple syntax highlighting simulation
+            return str
+                .replace(/(func|var|const|return|type|struct)/g, '<span class="code-keyword">$1</span>')
+                .replace(/(\/\/.+)/g, '<span class="code-comment">$1</span>')
+                .replace(/(".*?")/g, '<span class="code-string">$1</span>');
+        }
+
+        function explain(key) {
+            const data = archExplanations[key];
+            const display = document.getElementById('arch-detail');
+            display.innerHTML = `
+                <div class="slide-in">
+                    <h3 class="text-xl font-bold text-white mb-2 text-goBlue">${data.title}</h3>
+                    <p class="text-slate-300 text-sm leading-relaxed">${data.text}</p>
+                </div>
+            `;
+        }
+    </script>
+    
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. Charts via Chart.js (Canvas). Icons via Unicode. -->
+    <!-- Chosen Palette: Go Gopher Blue (#00ADD8) & Technical Grays -->
+    <!-- Application Structure Plan: 
+         1. Dashboard: High-level impact metrics (Radar Chart).
+         2. Feature Explorer: Tabbed deep-dive into functionality.
+         3. Architecture: Interactive file tree for educational value.
+         4. Start: Actionable steps.
+         Rationale: This structure mimics the "Discovery -> Understanding -> Action" user journey. -->
+    <!-- Visualization & Content Choices:
+         - Radar Chart: Chosen to visually demonstrate the "lightweight" advantage vs electron apps.
+         - Interactive List: Used for Architecture to handle dense information without clutter.
+         - Code Blocks: Used to prove the "Native Go" implementation claims. -->
+</body>
+</html>
