@@ -79,6 +79,11 @@ func (s *Server) routes() {
 	s.Mux.HandleFunc("GET /api/export", api.HandleExportData)
 	s.Mux.HandleFunc("POST /api/import", api.HandleImportData)
 
+	// 历史记录管理
+	s.Mux.HandleFunc("GET /api/history", api.HandleGetHistory)
+	s.Mux.HandleFunc("POST /api/history", api.HandleCreateHistory)
+	s.Mux.HandleFunc("DELETE /api/history", api.HandleDeleteHistory)
+
 	// 动态 Mock 服务 (匹配所有 /mock/ 开头的请求)
 	s.Mux.HandleFunc("/mock/", mock.HandleMockRequest)
 }

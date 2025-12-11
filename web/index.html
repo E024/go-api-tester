@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Go API Tester</title>
-	<link rel="icon" type="image/svg" href="/favicon.svg" />
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
 </head>
 <body>
     <div id="app">
@@ -13,19 +13,18 @@
             <div class="sidebar-header">
                 <!-- 模式切换 -->
                 <div class="mode-switcher">
-                    <button id="mode-api" class="mode-btn active" onclick="switchMode('api')">API Request</button>
-                    <button id="mode-mock" class="mode-btn" onclick="switchMode('mock')">Mock Server</button>
+                    <button id="mode-api" class="mode-btn active" onclick="switchMode('api')">Collections</button>
+                    <button id="mode-history" class="mode-btn" onclick="switchMode('history')">History</button>
+                    <button id="mode-mock" class="mode-btn" onclick="switchMode('mock')">Mock</button>
                 </div>
                 
                 <!-- 头部操作栏 -->
                 <div class="sidebar-actions">
                     <span id="sidebar-title">Collections</span>
                     <div class="sidebar-tools">
-                        <!-- Import/Export Buttons -->
-                        <button class="btn btn-secondary btn-sm" onclick="handleExportData()" title="Export Data">⬇️</button>
-                        <button class="btn btn-secondary btn-sm" onclick="triggerImport()" title="Import Data">⬆️</button>
-                        <!-- Add Button -->
-                        <button id="btn-sidebar-add" class="btn btn-secondary btn-sm" onclick="handleSidebarAdd()" title="New Collection/Mock">+</button>
+                        <button id="btn-export" class="btn btn-secondary btn-sm" onclick="handleExportData()" title="Export">⬇️</button>
+                        <button id="btn-import" class="btn btn-secondary btn-sm" onclick="triggerImport()" title="Import">⬆️</button>
+                        <button id="btn-sidebar-add" class="btn btn-secondary btn-sm" onclick="handleSidebarAdd()" title="Add">+</button>
                     </div>
                 </div>
             </div>
@@ -37,15 +36,30 @@
         <!-- 主区域 -->
         <div class="main-content">
             
+            <!-- [新增] 标签栏 -->
+            <div class="tab-bar-container" id="tab-bar" style="display: flex;">
+                <!-- JS 动态插入 workspace-tab -->
+            </div>
+
             <!-- VIEW: API Request -->
             <div id="view-api" class="workspace" style="display:flex; height:100%;">
                 <div class="toolbar">
+                    <!-- Mock Toggle Area -->
+                    <div style="display: flex; align-items: center; margin-right: 10px; padding-right: 10px; border-right: 1px solid #eee;">
+                        <input type="checkbox" id="use-mock-chk" style="cursor: pointer;">
+                        <label for="use-mock-chk" style="font-size: 12px; font-weight: 500; color: #555; margin-left: 4px; cursor: pointer; margin-right: 5px;">Mock</label>
+                        <input type="text" id="mock-host-input" placeholder="http://host:port" style="display: none; width: 120px; font-size: 11px; padding: 3px; border: 1px solid #ccc; border-radius: 3px;">
+                    </div>
+
                     <select id="req-method" class="method-select">
                         <option value="GET">GET</option><option value="POST">POST</option><option value="PUT">PUT</option><option value="DELETE">DELETE</option><option value="PATCH">PATCH</option>
                     </select>
                     <input type="text" id="req-url" class="url-input" placeholder="Enter request URL">
                     <button id="btn-send" class="btn btn-primary">Send</button>
-                    <button id="btn-save" class="btn btn-secondary" onclick="openSaveModal()">Save</button>
+                    <div style="display: flex; gap: 1px; margin-left: 5px;">
+                        <button id="btn-save" class="btn btn-secondary" style="border-radius: 4px 0 0 4px;" onclick="openSaveModal()">Save</button>
+                        <button class="btn btn-secondary" style="border-radius: 0 4px 4px 0; padding: 0 10px;" onclick="exportCurrentRequest()" title="Export Request">⬇</button>
+                    </div>
                 </div>
 
                 <div class="nav-tabs">
@@ -107,14 +121,17 @@
                 </div>
             </div>
 
-            <!-- VIEW: Mock Editor -->
+            <!-- VIEW: Mock Editor (隐藏) -->
             <div id="view-mock" class="workspace" style="display:none; height:100%;">
                 <div class="toolbar">
                     <div style="flex:1; font-weight:bold; color:#555;">Mock Rule Editor</div>
                     <div style="display:flex; align-items:center; gap:10px;">
                         <label><input type="checkbox" id="mock-active"> Enable</label>
                         <button class="btn btn-secondary" onclick="resetMockForm()">New Rule</button>
-                        <button class="btn btn-primary" onclick="saveMockRule()">Save Rule</button>
+                        <div style="display: flex; gap: 1px;">
+                            <button class="btn btn-primary" style="border-radius: 4px 0 0 4px;" onclick="saveMockRule()">Save Rule</button>
+                            <button class="btn btn-primary" style="border-radius: 0 4px 4px 0; padding: 0 10px;" onclick="exportCurrentMock()" title="Export Mock">⬇</button>
+                        </div>
                         <button class="btn btn-danger" id="btn-delete-mock" style="display:none;" onclick="deleteMockRule()">Delete</button>
                     </div>
                 </div>
